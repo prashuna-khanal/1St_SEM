@@ -6,7 +6,7 @@ from tkinter import ttk
 import tkinter as tk
 from tkinter import messagebox
 import database
-import os
+import subprocess
 
 # creating tkinter window
 home=customtkinter.CTk()
@@ -123,8 +123,8 @@ def payroll():
 
 # Define the function to go back to the login page
 def back_to_login():
+    subprocess.Popen(["python", "login.py"])  # Run the login page script (login.py)
     home.destroy()  # Close the current window
-    os.system("python hehe.py")  # Run the login page script (hehe.py)
 
 
 # adding fonts used overall
