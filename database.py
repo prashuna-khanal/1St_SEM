@@ -58,13 +58,7 @@ def id_exists(id):
     return result[0]>0
 
 
-def get_present_days(employee_id):
-    conn = sqlite3.connect('management.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT COUNT(*) FROM attendance WHERE employee_id=? AND status='Present'", (employee_id,))
-    result = cursor.fetchone()
-    conn.close()
-    return result[0] if result else 0
+
 
 
 

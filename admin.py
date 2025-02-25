@@ -6,6 +6,7 @@ from tkinter import ttk
 import tkinter as tk
 from tkinter import messagebox
 import database
+import os
 
 # creating tkinter window
 home=customtkinter.CTk()
@@ -94,9 +95,6 @@ def update_data():
         messagebox.showinfo("Success","Data has been updated.")
 
 
-
-
-
 # displaying data using add employee button
 def insert_data():
     id=id_entry.get()
@@ -117,12 +115,16 @@ def insert_data():
         highlight()
         messagebox.showinfo("Success","Data has been successfully inserted.")
 
+
+# Define the function to go to the salary receipt page
 def payroll():
     import receipt
 
 
-
-
+# Define the function to go back to the login page
+def back_to_login():
+    home.destroy()  # Close the current window
+    os.system("python hehe.py")  # Run the login page script (hehe.py)
 
 
 # adding fonts used overall
@@ -188,10 +190,12 @@ update_button.place(x=350,y=390)
 delete_button=customtkinter.CTkButton(home,font=font1,command=delete_data,text_color='#fff',text='Delete Employee',fg_color='#05A312',hover_color='#00850B',border_color='',cursor='hand2',border_width=2,corner_radius=10)
 delete_button.place(x=540,y=390)
 
+payroll_button = customtkinter.CTkButton(home,font=font1,text_color='#fff',text='Salary receipt',fg_color='#05A312',hover_color='#00850B',border_color='',cursor='hand2',border_width=2,corner_radius=10, command=payroll)                                           
+payroll_button.place(x=160, y=455)
 
-payroll_button = customtkinter.CTkButton(home,font=font1,text_color='#fff',text='Salary receipt',fg_color='#05A312',hover_color='#00850B',border_color='',cursor='hand2',border_width=2,corner_radius=10, command=payroll)
-                                                                                 
-payroll_button.place(x=260, y=455)
+back_button = customtkinter.CTkButton(home, font=font1, text_color='#fff', text='Back to Login',fg_color='#05A312', hover_color='#00850B',bg_color='#161C25', border_color='', cursor='hand2',border_width=2, corner_radius=10, command=back_to_login)
+back_button.place(x=360, y=455)  
+
 
 # creating a view page i.e employee data using tree
 view=ttk.Style(home)
