@@ -169,7 +169,37 @@ def attendance_window(employee_id):
     window.mainloop()
 
 # Mark attendance in the database
+def mark_attendance(employee_id, status):
+    """Insert the attendance record into the database, ensuring only one record per day per employee."""
+    date = datetime.now().strftime('%Y-%m-%d')  # Get current date
+    time = datetime.now().strftime('%H:%M:%S')  # Get current time in 24-hour format (HH:MM:SS)
 
+    conn = sqlite3.connect('management.db')  # Connect to the database
+    cursor = conn.cursor()
+
+    try:
+        # Check if an attendance record already exists for this employee on the current day
+        cursor.execute('''
+            SELECT COUNT(*) FROM Attendance
+            WHERE employee_id = ? AND date = ?
+        ''', (employee_id, date))
+        count = cursor.fetchone()[0]
+
+        if count > 0:
+            # If there's already an attendance record for today, show an error message
+            messagebox.showerror("Error", f"Attendance has already been marked for today.")
+        else:
+            # If no record exists for today, insert the attendance record
+            cursor.execute('''
+                INSERT INTO Attendance (employee_id, date, time, status)
+                VALUES (?, ?, ?, ?)
+            ''', (employee_id, date, time, status))
+            conn.commit()
+            messagebox.showinfo("Success", f"Attendance marked as {status} for {date} at {time}")
+    except sqlite3.Error as e:
+        print(f"Error inserting attendance: {e}")
+    finally:
+        conn.close()
 
 
 # Open and resize image
