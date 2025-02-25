@@ -40,21 +40,7 @@ def count_present_days(employee_id):
     finally:
         conn.close()
 
-def calculate_salary_for_present_days(employee_id):
-    """Calculate the total salary based on present days."""
-    salary = fetch_salary(employee_id)  # Fetch salary
-    if salary is None:
-        messagebox.showerror("Error", f"No salary found for employee ID {employee_id}")
-        return
 
-    present_days = count_present_days(employee_id)  # Fetch present days
-    if present_days == 0:
-        messagebox.showinfo("No Present Days", f"Employee ID {employee_id} has no present days recorded.")
-        return
-
-    # Calculate total salary for present days
-    total_salary = salary * present_days
-    return total_salary
 
 
 
