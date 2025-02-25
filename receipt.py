@@ -3,6 +3,7 @@ from tkinter import messagebox
 import sqlite3
 from datetime import datetime
 
+
 def fetch_salary(employee_id):
     """Fetch the salary of an employee based on employee_id."""
     conn = sqlite3.connect("management.db")
@@ -23,22 +24,23 @@ def fetch_salary(employee_id):
         conn.close()
 
 def count_present_days(employee_id):
-    """Count how many times 'Present' is marked for the employee."""
+    """Count how many times 'present' has been marked for the employee."""
     conn = sqlite3.connect('management.db')  # Connect to the database
     cursor = conn.cursor()
 
     try:
         cursor.execute('''
             SELECT COUNT(*) FROM Attendance
-            WHERE employee_id = ? AND status = 'active'
+            WHERE employee_id = ? AND status = 'Present'
         ''', (employee_id,))
-        present_count = cursor.fetchone()[0]  # Fetch the result and get the count
+        present_count = cursor.fetchone()[0]  # Fetch the result and get the first item (count)
+        conn.close()
+
         return present_count
     except sqlite3.Error as e:
         print(f"Error counting present days: {e}")
-        return 0
-    finally:
         conn.close()
+        return 0
 
 def calculate_salary_for_present_days(employee_id):
     """Calculate the total salary based on present days."""
@@ -54,6 +56,7 @@ def calculate_salary_for_present_days(employee_id):
 
     # Calculate total salary for present days
     total_salary = salary * present_days
+    messagebox.showinfo("Total Salary", f"Total salary for {present_days} present days: Rs. {total_salary:.2f}")
     return total_salary
 
 def fetch_employee_details(employee_id):
