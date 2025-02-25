@@ -30,7 +30,7 @@ def count_present_days(employee_id):
     try:
         cursor.execute('''
             SELECT COUNT(*) FROM Attendance
-            WHERE employee_id = ? AND status = 'Present'
+            WHERE employee_id = ? AND status = 'active'
         ''', (employee_id,))
         present_count = cursor.fetchone()[0]  # Fetch the result and get the count
         return present_count
@@ -40,9 +40,21 @@ def count_present_days(employee_id):
     finally:
         conn.close()
 
+def calculate_salary_for_present_days(employee_id):
+    """Calculate the total salary based on present days."""
+    salary = fetch_salary(employee_id)  # Fetch salary
+    if salary is None:
+        messagebox.showerror("Error", f"No salary found for employee ID {employee_id}")
+        return
 
+    present_days = count_present_days(employee_id)  # Fetch present days
+    if present_days == 0:
+        messagebox.showinfo("No Present Days", f"Employee ID {employee_id} has no present days recorded.")
+        return
 
-
+    # Calculate total salary for present days
+    total_salary = salary * present_days
+    return total_salary
 
 def fetch_employee_details(employee_id):
     """Fetch employee details from the database based on employee_id."""
@@ -72,7 +84,7 @@ def generate_salary_receipt(employee_id, employee_name, role, gender, total_sala
     receipt_window = tk.Toplevel(root)
     receipt_window.title("Salary Receipt")
     receipt_window.geometry("400x500")
-    
+    receipt_window.configure(bg="#FFFFFF")
     
     # Add labels to the receipt window
     receipt_label = tk.Label(receipt_window, text=f"Salary Receipt for {employee_name} ({employee_id})", font=("Arial", 14, "bold"))
@@ -96,6 +108,7 @@ def generate_salary_receipt(employee_id, employee_name, role, gender, total_sala
     tk.Label(receipt_window, text="This is a system-generated salary receipt. No signature required.", font=("Arial", 10, "italic")).pack(pady=10)
      
     # receipt_window.destroy()
+
 def generate_receipt():
     """Function to collect data and generate the receipt in a new window."""
     try:
@@ -125,12 +138,12 @@ def generate_receipt():
             return
 
         # Call the function to generate and display the salary receipt
-        generate_salary_receipt(employee_id, employee_name, role, gender, salary, "Present", allowances, deductions, net_salary, month, year)
+        generate_salary_receipt(employee_id, employee_name, role, gender, salary, "active", allowances, deductions, net_salary, month, year)
 
     except ValueError:
         # Handle case where the user enters invalid input
         messagebox.showerror("Input Error", "Please enter valid numbers for salary components.")
-        
+
 def on_employee_id_entry_change(*args):
     """Update employee details and calculate salary automatically when employee_id changes."""
     employee_id = entry_employee_id.get()
@@ -172,57 +185,56 @@ root.title("Salary Receipt Generator")
 root.geometry("400x500")
 
 # Create the input fields and labels
-tk.Label(root, text="Employee ID:", fg="#000E65").grid(row=0, column=0, padx=10, pady=5)
+tk.Label(root, text="Employee ID:", fg="#0a2351",font=("Poppins", 10,"bold")).grid(row=1, column=0, padx=10, pady=5)
 entry_employee_id = tk.Entry(root)
-entry_employee_id.grid(row=0, column=1, padx=10, pady=5)
+entry_employee_id.grid(row=1, column=1, padx=10, pady=5)
 
-tk.Label(root, text="Employee Name:", fg="#000E65").grid(row=1, column=0, padx=10, pady=5)
+tk.Label(root, text="Employee Name:", fg="#0a2351",font=("Poppins", 10,"bold")).grid(row=2, column=0, padx=10, pady=5)
 entry_employee_name = tk.Entry(root)
-entry_employee_name.grid(row=1, column=1, padx=10, pady=5)
+entry_employee_name.grid(row=2, column=1, padx=10, pady=5)
 
-tk.Label(root, text="Role:", fg="#000E65").grid(row=2, column=0, padx=10, pady=5)
+tk.Label(root, text="Role:", fg="#0a2351",font=("Poppins", 10,"bold")).grid(row=3, column=0, padx=10, pady=5)
 entry_role = tk.Entry(root)
-entry_role.grid(row=2, column=1, padx=10, pady=5)
+entry_role.grid(row=3, column=1, padx=10, pady=5)
 
-tk.Label(root, text="Gender:", fg="#000E65").grid(row=3, column=0, padx=10, pady=5)
+tk.Label(root, text="Gender:", fg="#0a2351",font=("Poppins", 10,"bold")).grid(row=4, column=0, padx=10, pady=5)
 entry_gender = tk.Entry(root)
-entry_gender.grid(row=3, column=1, padx=10, pady=5)
+entry_gender.grid(row=4, column=1, padx=10, pady=5)
 
-tk.Label(root, text="Base Salary:", fg="#000E65").grid(row=4, column=0, padx=10, pady=5)  # Fixed row index for Base Salary
+tk.Label(root, text="Base Salary:",fg="#0a2351",font=("Poppins", 10,"bold")).grid(row=5, column=0, padx=10, pady=5)  # Fixed row index for Base Salary
 entry_base_salary = tk.Entry(root)
-entry_base_salary.grid(row=4, column=1, padx=10, pady=5)
+entry_base_salary.grid(row=5, column=1, padx=10, pady=5)
 
-tk.Label(root, text="No. of Present days:", fg="#000E65").grid(row=5, column=0, padx=10, pady=5)  # Fixed row index for Present Days
+tk.Label(root, text="No. of Present days:", fg="#0a2351",font=("Poppins", 10,"bold")).grid(row=6, column=0, padx=10, pady=5)  # Fixed row index for Present Days
 entry_present = tk.Entry(root)
-entry_present.grid(row=5, column=1, padx=10, pady=5)
+entry_present.grid(row=6, column=1, padx=10, pady=5)
 
-tk.Label(root, text="Salary:", fg="#000E65").grid(row=6, column=0, padx=10, pady=5)  # Fixed row index for Salary
+tk.Label(root, text="Salary:", fg="#0a2351",font=("Poppins", 10,"bold")).grid(row=7, column=0, padx=10, pady=5)  # Fixed row index for Salary
 entry_salary = tk.Entry(root)
-entry_salary.grid(row=6, column=1, padx=10, pady=5)
+entry_salary.grid(row=7, column=1, padx=10, pady=5)
 
-tk.Label(root, text="Allowances:", fg="#000E65").grid(row=7, column=0, padx=10, pady=5)  # Fixed row index for Allowances
+tk.Label(root, text="Allowances:", fg="#0a2351",font=("Poppins", 10,"bold")).grid(row=8, column=0, padx=10, pady=5)  # Fixed row index for Allowances
 entry_allowances = tk.Entry(root)
-entry_allowances.grid(row=7, column=1, padx=10, pady=5)
+entry_allowances.grid(row=8, column=1, padx=10, pady=5)
 
-tk.Label(root, text="Deductions:", fg="#000E65").grid(row=8, column=0, padx=10, pady=5)  # Fixed row index for Deductions
+tk.Label(root, text="Deductions:", fg="#0a2351",font=("Poppins", 10,"bold")).grid(row=9, column=0, padx=10, pady=5)  # Fixed row index for Deductions
 entry_deductions = tk.Entry(root)
-entry_deductions.grid(row=8, column=1, padx=10, pady=5)
+entry_deductions.grid(row=9, column=1, padx=10, pady=5)
 
-tk.Label(root, text="Month:", fg="#000E65").grid(row=9, column=0, padx=10, pady=5)  # Fixed row index for Month
+tk.Label(root, text="Month:", fg="#0a2351",font=("Poppins", 10,"bold")).grid(row=10, column=0, padx=10, pady=5)  # Fixed row index for Month
 entry_month = tk.Entry(root)
-entry_month.grid(row=9, column=1, padx=10, pady=5)
+entry_month.grid(row=10, column=1, padx=10, pady=5)
 
-tk.Label(root, text="Year:", fg="#000E65").grid(row=10, column=0, padx=10, pady=5)  # Fixed row index for Year
+tk.Label(root, text="Year:", fg="#0a2351",font=("Poppins", 10,"bold")).grid(row=11, column=0, padx=10, pady=5)  # Fixed row index for Year
 entry_year = tk.Entry(root)
-entry_year.grid(row=10, column=1, padx=10, pady=5)
-
+entry_year.grid(row=11, column=1, padx=10, pady=5)
 
 # Bind the employee ID entry to automatically fetch and populate details
 entry_employee_id.bind("<KeyRelease>", on_employee_id_entry_change)
 
 # Generate Receipt Button
-btn_generate = tk.Button(root, text="Generate Receipt", command=generate_receipt,fg="#000E65")
-btn_generate.grid(row=11, column=0, columnspan=2, pady=20)
+btn_generate = tk.Button(root, text="Generate Receipt", command=generate_receipt,fg='#0a2351',bg="light grey",cursor="hand2",)
+btn_generate.grid(row=12, column=1, columnspan=2, pady=20)
 
 # Run the Tkinter event loop
 root.mainloop()
